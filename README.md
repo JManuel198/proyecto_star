@@ -9,6 +9,6 @@ proximamente a ser implantado en el Liceo Paez de Acarigua.
 - Sebastian Manzano
 - Orlando Herrera
 - Manuel Jauregui
-- Gabriel Yaraur
-- Victor Mirele
+- Gabriel Yaraure
+- Victor Mireles
 
