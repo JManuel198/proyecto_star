@@ -81,8 +81,8 @@ class ClaseDB:
         print(self.cursor.fetchall())
         return self.cursor.fetchall()
 
-    def consultar(self,sql):
-        self.cursor.execute(sql)
+    def consultar(self,sql,parametros=()):
+        self.cursor.execute(sql,parametros)
         self.conexion.commit()
         return self.cursor.fetchall()
 
@@ -93,4 +93,8 @@ class ClaseDB:
         self.cursor.executemany(query_insert, datos_personal)
         self.conexion.commit()
 
-
+if __name__ == "__main__":
+    from tkinter import messagebox
+    print("================================")
+    print("Ejecuta vews.py, no este archivo")
+    messagebox.showinfo("Error","Por favor abra el archivo vews.py, no este")
