@@ -2,7 +2,7 @@ import sqlite3
 # Datos dummy para la tabla principal
 # Nota: id_grado, id_cargo, id_tipo, id_estado son los números que insertamos arriba
 datos_personal = [
-    (20032323, "Yusepe", "Aranguren", "Calle 10, Casa 5", "yusepe@mail.com", "0412-1112233", "0012345", "Comuna A", "Ing. Sistemas", 4, 3, 1, 1),
+    (32160371, "Yusepe", "Moroso Rossi", "Calle 10, Casa 5", "yusepe@mail.com", "0412-1112233", "0012345", "Comuna A", "Ing. Sistemas", 4, 3, 1, 1),
     (25987654, "Beximar", "Rodriguez", "Av. Principal 12", "bexi@mail.com", "0414-9998877", "0054321", "Comuna B", "Lic. Administracion", 3, 1, 2, 1),
     (18456123, "Carlos", "Perez", "Barrio El Centro", "carlos@mail.com", "0416-5554433", "0099887", "Comuna C", "Bachiller", 1, 5, 1, 2)
 ]

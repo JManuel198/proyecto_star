@@ -22,14 +22,20 @@ class Star():
         self.boton_refrescar = tk.Button(self.header_frame,text="refrescar",command=self.refrescar_tree)
         self.boton_refrescar.grid(row=0,column=0)
 
-        self.boton_mostrar = tk.Button(self.header_frame,text="Mostrar",command=self.ventana_mostrar)
-        self.boton_mostrar.grid(row=0,column=1)
-        self.boton_nuevo = tk.Button(self.header_frame,text="Nuevo",command=lambda:messagebox.showinfo("Work in Progress","Aqui se mostrara la ventana"))
-        self.boton_nuevo.grid(row=0,column=2)
-        self.boton_modificar = tk.Button(self.header_frame,text="Modificar",command=lambda:messagebox.showinfo("Work in Progress","Aqui se mostrara la ventana"))
-        self.boton_modificar.grid(row=0,column=3)
-        self.boton_borrar = tk.Button(self.header_frame,text="Eliminar",command=lambda:messagebox.showinfo("Work in Progress","Aqui se mostrara la ventana"))
-        self.boton_borrar.grid(row=0,column=4)
+        self.boton_mostrar = tk.Button(self.header_frame,text="Mostrar",command=self.verificar_cedula)
+        self.boton_mostrar.grid(row=0,column=2)
+
+        self.textbox_buscar = tk.Entry(self.header_frame)
+        self.textbox_buscar.grid(row=0,column=1)
+
+        self.boton_nuevo = tk.Button(self.header_frame,text="Nuevo",command=self.work_in_progress)
+        self.boton_nuevo.grid(row=0,column=3)
+
+        self.boton_modificar = tk.Button(self.header_frame,text="Modificar",command=self.work_in_progress)
+        self.boton_modificar.grid(row=0,column=4)
+
+        self.boton_borrar = tk.Button(self.header_frame,text="Eliminar",command=self.work_in_progress)
+        self.boton_borrar.grid(row=0,column=5)
 
     def crear_widgets_tree(self):
         self.tree_columnas = ('codigo','cedula','nombres','apellidos','direccion','correo','telefono','carnet_patria','comuna','titulo_obtenido','id_grado','id_cargo','id_tipo_personal','id_estado_laboral')
@@ -72,6 +78,20 @@ class Star():
         for registro in db.consultar("SELECT * FROM personal"):
             print(registro)
             self.tree.insert("","end",values=registro)
+
+    def work_in_progress(self):
+        messagebox.showinfo("Work in Progress","Aqui se mostrara la ventana")
+
+    def verificar_cedula(self):
+        cedula_buscar = self.textbox_buscar.get()
+        cedulas_db = []
+        for fila in db.consultar("SELECT cedula FROM personal"):
+            cedulas_db.append(fila[0])
+        print(cedulas_db)
+        if int(cedula_buscar) in cedulas_db:
+            messagebox.showinfo("Yay","EXISTE!!!11!!")
+        else:
+            messagebox.showinfo("no furulo","huh?")
 
 
 db = ClaseDB(":memory:")
