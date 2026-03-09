@@ -1,5 +1,6 @@
 from database import *
 import tkinter as tk
+import sys
 from tkinter import ttk
 from tkinter import messagebox
 
@@ -15,6 +16,7 @@ class Star():
         self.crear_widgets()
 
     def crear_widgets(self):
+        self.campos = ('Codigo:','Cedula:','Nombres:','Apellidos:','Direccion:','Correo:','Telefono:','Carnet de la Patria: ','Comuna:','Titulo obtenido:','Grado:','Cargo:','Tipo personal:','Eestado laboral:') # campos usado por las ventanas
         self.crear_widgets_header()
         self.crear_widgets_tree()
 
@@ -28,7 +30,7 @@ class Star():
         self.textbox_buscar = tk.Entry(self.header_frame)
         self.textbox_buscar.grid(row=0,column=1)
 
-        self.boton_nuevo = tk.Button(self.header_frame,text="Nuevo")
+        self.boton_nuevo = tk.Button(self.header_frame,text="Nuevo",command=self.agregar_ventana)
         self.boton_nuevo.grid(row=0,column=3)
 
         self.boton_modificar = tk.Button(self.header_frame,text="Modificar")
@@ -38,7 +40,7 @@ class Star():
         self.boton_borrar.grid(row=0,column=5)
 
     def crear_widgets_tree(self):
-        self.tree_columnas = ('codigo','cedula','nombres','apellidos','direccion','correo','telefono','carnet_patria','comuna','titulo_obtenido','id_grado','id_cargo','id_tipo_personal','id_estado_laboral')
+        self.tree_columnas = ('codigo','cedula','nombres','apellidos','direccion','correo','telefono','carnet_patria')
         self.tree = ttk.Treeview(self.tree_frame)
         self.tree['show'] = "headings"
         self.tree['columns'] = self.tree_columnas
@@ -52,19 +54,19 @@ class Star():
         self.tree.heading("telefono",text="Telefono")
         self.tree.heading("correo",text="Correo")
         self.tree.heading("carnet_patria",text="C. Patria")
-        self.tree.heading("comuna",text="Comuna")
-        self.tree.heading("titulo_obtenido",text="Titulo")
-        self.tree.heading("id_grado",text="Grado")
-        self.tree.heading("id_cargo",text="Cargo")
-        self.tree.heading("id_tipo_personal",text="Tipo de Personal")
-        self.tree.heading("id_estado_laboral",text="Estado")
+        # self.tree.heading("comuna",text="Comuna")
+        # self.tree.heading("titulo_obtenido",text="Titulo")
+        # self.tree.heading("id_grado",text="Grado")
+        # self.tree.heading("id_cargo",text="Cargo")
+        # self.tree.heading("id_tipo_personal",text="Tipo de Personal")
+        # self.tree.heading("id_estado_laboral",text="Estado")
 
-        self.tree.grid(row=0,column=0)
+        self.tree.pack(fill="both",expand=True)
         self.refrescar_tree()
 
     def mostrar_ventana(self):
         self.ventana_mostrar = tk.Toplevel(self.root)
-        self.ventana_mostrar.title("Nueva ventana")
+        self.ventana_mostrar.title("Visualizar registro")
         self.ventana_mostrar.geometry("800x500")
         self.ventana_mostrar.grab_set()
 
@@ -75,8 +77,10 @@ class Star():
         if not registro:
             messagebox.showwarning("Error", "No se encontró el registro")
             return
-        datos = registro[0]
-        for i, campo in enumerate(self.tree_columnas):
+        datos = registro[0] # "descomprime" el array para pasar la tupla pura al mostrador de registros
+        # print(registro)
+        # print(datos)
+        for i, campo in enumerate(self.campos):
             label = tk.Label(self.ventana_mostrar, text=campo)
             label.grid(row=i, column=0, pady=5, padx=5)
 
@@ -85,8 +89,18 @@ class Star():
             entry.insert(0,datos[i])
             entry.config(state="readonly")
 
+    def agregar_ventana(self):
+        self.ventana_agregar = tk.Toplevel(self.root)
+        self.ventana_agregar.title("Nuevo registro")
+        self.ventana_agregar.geometry("800x500")
+        self.ventana_agregar.grab_set()
 
+        self.agregar_ventana_widgets()
 
+    def agregar_ventana_widgets(self):
+        for i,campo in enumerate(self.campos):
+            label = tk.Label(self.ventana_agregar,text=campo)
+            label.grid(row=i, column=0,pady=5, padx=5)
 
 
     def refrescar_tree(self):
@@ -108,6 +122,7 @@ class Star():
             self.mostrar_ventana()
 
         else:
+
             messagebox.showinfo("No encontrado","No se encontro en la base de datos.")
 
 if __name__ == "__main__":
