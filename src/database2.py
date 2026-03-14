@@ -53,18 +53,31 @@ class DB():
         # 3. Creación de la Vista (para devolver nombres en lugar de IDs)
         self.cursor.execute("DROP VIEW IF EXISTS vista_personal_detallada")
         self.cursor.execute("""
-            CREATE VIEW vista_personal_detallada AS 
-            SELECT 
-                p.id_personal, p.cedula, p.nombres, p.apellidos, p.cargo,
-                g.descripcion AS grado_instruccion,
-                c.nombre AS categoria,
-                e.nombre AS estado_laboral,
-                p.fecha_ingreso, p.anos_servicio
-            FROM Personal p
-            LEFT JOIN Grado_instruccion g ON p.id_grado_instruccion = g.id_grado_instruccion
-            LEFT JOIN Categoria_personal c ON p.id_categoria_personal = c.id_categoria_personal
-            LEFT JOIN Estado_laboral e    ON p.id_estado_laboral = e.id_estado_laboral;
-        """)
+    CREATE VIEW vista_personal_detallada AS 
+    SELECT 
+        p.cedula, 
+        p.nombres, 
+        p.apellidos, 
+        p.fecha_nacimiento, 
+        p.edad, 
+        p.direccion, 
+        p.correo, 
+        p.telefono, 
+        p.carnet_patria, 
+        p.titulo_obtenido, 
+        p.fecha_ingreso, 
+        p.anos_servicio, 
+        p.comuna, 
+        p.cargo,
+        p.codigo_dependencia,
+        g.descripcion AS grado_instruccion,
+        c.nombre AS categoria,
+        e.nombre AS estado_laboral
+    FROM Personal p
+    LEFT JOIN Grado_instruccion g ON p.id_grado_instruccion = g.id_grado_instruccion
+    LEFT JOIN Categoria_personal c ON p.id_categoria_personal = c.id_categoria_personal
+    LEFT JOIN Estado_laboral e    ON p.id_estado_laboral = e.id_estado_laboral;
+""")
 
         # 4. Triggers para automatizar Edad y Años de Servicio
         self.cursor.execute("""
@@ -81,35 +94,41 @@ class DB():
             AFTER INSERT ON Personal
             BEGIN
                 UPDATE Personal
-                SET codigo_dependencia = 'DEP-' || printf('%03d', NEW.id_personal)
+                SET codigo_dependencia = 'PAEZ-' || printf('%03d', NEW.id_personal)
                 WHERE id_personal = NEW.id_personal 
                 AND (codigo_dependencia IS NULL OR codigo_dependencia = '');
             END;
         """)
 
     def datos_prueba(self):
-        # Usamos ignore para evitar errores si los datos ya existen
-        self.cursor.execute("INSERT OR IGNORE INTO Grado_instruccion (descripcion) VALUES ('No Graduado'),('Bachiller'),('Técnico Medio'),('Universitario'),('Postgrado')")
-        self.cursor.execute("INSERT OR IGNORE INTO Estado_laboral (nombre) VALUES ('Activo'),('Reposo')")
-        self.cursor.execute("INSERT OR IGNORE INTO Categoria_personal (nombre) VALUES ('Administrativo'),('Obrero'),('Docente'),('Directivo')")
-        
-        # Insertar personal de prueba (dejando edad y años en 0 para que el trigger los calcule)
-        self.cursor.execute("""INSERT OR IGNORE INTO Personal (
-            cedula, nombres, apellidos, fecha_nacimiento, fecha_ingreso, 
-            id_grado_instruccion, id_categoria_personal, id_estado_laboral
-        ) VALUES 
-        ('12345678', 'Yusepe', 'Rossi', '1985-05-20', '2015-01-15', 3, 1, 1),
-        ('87654321', 'Beximar', 'Escalona', '1992-11-03', '2018-03-10', 3, 3, 1),
-        ('11223344', 'Grober', 'Smith', '1970-08-25', '2000-06-01', 1, 2, 2)""")
+            # 1. Asegurar tablas maestras con IDs fijos
+            self.cursor.execute("INSERT OR IGNORE INTO Grado_instruccion (id_grado_instruccion, descripcion) VALUES (1, 'No Graduado'), (2, 'Bachiller'), (3, 'Tecnico Medio'), (4, 'Universitario'), (5,'Postgrado')")
+            self.cursor.execute("INSERT OR IGNORE INTO Estado_laboral (id_estado_laboral, nombre) VALUES (1, 'Activo'), (2, 'Reposo')")
+            self.cursor.execute("INSERT OR IGNORE INTO Categoria_personal (id_categoria_personal, nombre) VALUES (1, 'No graduado'), (2, 'Docente I'), (3, 'Docente II'), (4, 'Docente III'),(5, 'Docente IV'),(6, 'Docente V'),(7, 'Docente VI'),(8, 'Docente III'),(9, 'TSU I'),(10, 'TSU II'),(11, 'Profesional I'),(12, 'Profesional II'),(13,'Profesional III'),(14,'Obrero I'),(15,'Obrero II'),(16, 'Aseador I'),(17, 'Aseador II'),(18, 'Mensajero'),(19, 'Portero'),(20, 'Vigilante'),(21, 'Otro')")
 
+            # 2. Datos de prueba completos (18 columnas según la estructura de la tabla)
+            # Nota: edad, anos_servicio y codigo_dependencia se dejan NULL porque los Triggers los llenarán
+            personal_data = [
+                ('12345678', 'Yusepe', 'Rossi', '1985-05-20', 'Av. Intercomunal Casa 10', 'yrossi@email.com', '0412-1112233', '10002233', 'Ingeniero de Sistemas', '2015-01-15', 'Comuna Central', 'Analista IT', 3, 1, 1),
+                ('87654321', 'Beximar', 'Escalona', '1992-11-03', 'Calle 5 de Julio Edif. A', 'bescalona@email.com', '0414-4445566', '20005566', 'Lic. Educación', '2018-03-10', 'Comuna Norte', 'Docente de Aula', 3, 3, 1),
+                ('11223344', 'Grober', 'Smith', '1970-08-25', 'Sector La Lucia Vereda 4', 'gsmith@email.com', '0416-7778899', '30008899', 'Bachiller Técnico', '2000-06-01', 'Comuna Sur', 'Mantenimiento', 1, 2, 2),
+                ('20334455', 'Maria', 'Delgado', '1998-02-14', 'Res. Las Flores Apto 4-B', 'mdelgado@email.com', '0424-2223344', '40003344', 'Técnico Informática', '2022-05-20', 'Comuna Este', 'Secretaria', 2, 1, 1),
+                ('9556677', 'Ricardo', 'Mendoza', '1975-12-30', 'Urb. El Parque Calle 2', 'rmendoza@email.com', '0412-9990011', '50000011', 'Magister Gerencia', '2010-09-01', 'Comuna Central', 'Director', 4, 4, 1)
+            ]
+
+            # Usamos REPLACE para que sobrescriba los registros viejos que tenían valores NULL
+            self.cursor.executemany("""
+                INSERT OR REPLACE INTO Personal (
+                    cedula, nombres, apellidos, fecha_nacimiento, direccion, 
+                    correo, telefono, carnet_patria, titulo_obtenido, fecha_ingreso, 
+                    comuna, cargo, id_grado_instruccion, id_categoria_personal, id_estado_laboral
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, personal_data)
+
+            self.conexion.commit()
+            self.conexion.commit()
 # --- Ejecución del programa ---
 db = DB(":memory:") # Cambiado de :memory: a un archivo para que lo veas
 db.crear_esquema()
 db.datos_prueba()
 
-# CONSULTA CLAVE: Usamos la VISTA para ver nombres en lugar de IDs
-print("-" * 30)
-print("REPORTE DETALLADO (USANDO JOINS/VISTA):")
-resultados = db.consultar("SELECT * FROM vista_personal_detallada")
-for fila in resultados:
-    print(fila)
